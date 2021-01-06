@@ -1,0 +1,33 @@
+management:
+  endpoints:
+    web:
+      cors:
+        allowed-origins: http://localhost:8081
+        allowed-methods: PUT,POST,GET,OPTIONS,DELETE
+        allow-credentials: true
+spring:
+  datasource:
+    url: jdbc:mysql://synergy-dev-env.cdn32ggqzpo2.us-east-2.rds.amazonaws.com:3306/synergy_dev?createDatabaseIfNotExist=true
+    username: synergy_dev
+    password: Tester123$
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  jta:
+    atomikos:
+      properties:
+        recovery:
+          forget-orphaned-log-entries-delay:
+logging.level.org.springframework.web: DEBUG
+logging.level.org.hibernate: ERROR
+security:
+  oauth2:
+    resource:
+      token-info-uri: http://localhost:8080/oauth/check_token
+    client:
+      client-id: web
+      client-secret: pin
+      access-token-uri: http://localhost:8080/oauth/token
+      user-authorization-uri: http://localhost:8080/oauth/authorize

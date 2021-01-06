@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>Synergy-Bio | OAuth Approval</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <style>
+        .custom-card-header {
+            background-color: white;
+            border-bottom: 0px;
+            font-family: sans-serif;
+            font-size: 3em;
+            font-weight: 100;
+        }
+
+        .custom-logo-size {
+            width: 100%;
+            height: 70%;
+        }
+    </style>
+</head>
+<body>
+<div class="container pt-5">
+    <div class="card">
+        <h5 class="card-header info-color white-text has-text-left py-4 custom-card-header">
+            <strong>Access Confirmation</strong>
+        </h5>
+        <div class="card-body px-lg-5 pt-5">
+            <div class="row">
+                <div class="col-md-7">
+                    <form id="confirmationForm" name="confirmationForm" action="/oauth/authorize" method="post">
+                        <div class="form-group">
+                            <p>Do you authorize <span th:text="${client.getClientId()}"></span> to
+                                access
+                                your protected resources?
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <input name="user_oauth_approval" value="true" type="hidden"/>
+                        </div>
+                        <ul>
+                            <li>
+                                <div class="radio">
+                                    <div class="form-group">
+                                        READ:
+                                        <input type="radio" name="scope.READ" value="true" checked=""/>Approve
+                                        <input type="radio" name="scope.READ" value="false"/>Deny
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="radio">
+                                    <div class="form-group">
+                                        WRITE:
+                                        <input type="radio" name="scope.WRITE" value="true" checked="">Approve
+                                        <input type="radio" name="scope.WRITE" value="false">Deny
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <label>
+                            <button name="authorize" type="submit"
+                                    class="btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0">
+                                Authorize
+                            </button>
+                        </label>
+                    </form>
+                </div>
+                <div class="col-5">
+                    <img class="custom-logo-size" src="http://www.synergybio.lk/templates/sj_joomla3/images/logo.png">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
