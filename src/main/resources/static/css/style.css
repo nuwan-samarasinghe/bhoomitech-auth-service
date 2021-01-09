@@ -16,9 +16,8 @@ html, body {
 
 .form-design {
     width: 330px;
-    height: 400px;
     position: absolute;
-    top: 0;
+    top: 100px;
     bottom: 0;
     left: 0;
     right: 0;

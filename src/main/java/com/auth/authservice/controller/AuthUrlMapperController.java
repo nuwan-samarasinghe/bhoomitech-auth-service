@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -22,19 +23,28 @@ public class AuthUrlMapperController {
 
     @GetMapping("/login")
     String loginUser() {
-        log.info("redirecting the application to login page");
         return "html/login";
     }
 
     @GetMapping("/error")
     String errorPageUrl() {
-        log.info("redirecting the application error page");
         return "html/error";
     }
 
     @GetMapping("/forgot-password")
     String forgotPassword() {
         return "html/forgot-password";
+    }
+
+    @GetMapping("/register")
+    String register() {
+        return "html/register";
+    }
+
+    @GetMapping("/reset-password/{token}")
+    String resetPassword(@PathVariable("token") String token) {
+        System.out.println(token);
+        return "html/reset-password";
     }
 
     @GetMapping(value = "/oauth/confirm_access")

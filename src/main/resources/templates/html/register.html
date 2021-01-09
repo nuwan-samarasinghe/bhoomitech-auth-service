@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
-
 <head>
+    <title>Welcome | Login to your account</title>
     <meta charset="UTF-8">
-    <title>Forgot Password</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
           integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -22,27 +22,54 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
-
 <div class="form-design">
     <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        Invalid email provided.
+        Sorry, Something went wrong..
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <h2 class="font-white">Forgot Password</h2>
+    <div th:if="${param.sucess}" class="alert alert-success alert-dismissible fade show" role="alert">
+        Your account has bee created
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <h2 class="font-white">Create Your Account</h2>
     <form class="md-form" style="color: #192c34;" th:action="@{/login}" method="post">
         <div class="text-center">
             <img th:src="@{/img/logo.png}" class="logo" alt="Avatar">
         </div>
         <div class="form-group">
-            <input type="text" id="email" name="email" class="form-control" placeholder="Your email" required>
+            <input type="text" id="username" name="username" class="form-control" placeholder="User Name" required>
         </div>
-        <label class="float-left small">We will send a password reset link to your email.</label>
         <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block">Send</button>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+            <input type="text" id="address" name="address" class="form-control" placeholder="Address" required>
+        </div>
+        <div class="form-group">
+            <input type="tel" id="telephone" name="telephone" class="form-control" placeholder="Telephone" required>
+        </div>
+        <div class="form-group">
+            <input type="text" id="organization" name="organization" class="form-control" placeholder="Organization"
+                   required>
+        </div>
+        <div class="form-group">
+            <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="New Password" required>
+        </div>
+        <div class="form-group">
+            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm Password" required>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+        </div>
+        <div class="bottom-action clearfix">
+            <label class="float-left form-check-label"><input type="checkbox"> I accept term & conditions</label>
         </div>
     </form>
+    <p class="text-center font-white">Already have an account? <a th:href="@{/login}">Sign In </a></p>
 </div>
 </body>
 </html>
