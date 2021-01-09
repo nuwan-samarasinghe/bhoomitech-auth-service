@@ -1,3 +1,6 @@
 spring:
   application:
     name: auth
+  cloud:
+    config:
+      uri: http://localhost:12001/auth/local
