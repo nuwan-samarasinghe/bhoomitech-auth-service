@@ -23,18 +23,18 @@ public class AuthUrlMapperController {
     @GetMapping("/login")
     String loginUser() {
         log.info("redirecting the application to login page");
-        return "login";
+        return "html/login";
     }
 
     @GetMapping("/error")
     String errorPageUrl() {
         log.info("redirecting the application error page");
-        return "error";
+        return "html/error";
     }
 
     @GetMapping("/forgot-password")
     String forgotPassword() {
-        return "forgot-password";
+        return "html/forgot-password";
     }
 
     @GetMapping(value = "/oauth/confirm_access")
