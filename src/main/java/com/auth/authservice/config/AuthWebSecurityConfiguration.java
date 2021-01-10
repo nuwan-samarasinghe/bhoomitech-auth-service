@@ -36,6 +36,8 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/v2/api-docs/**",
                         "/webjars/**",
                         "/register",
+                        "/error",
+                        "/oauth/*",
                         "/forgot-password",
                         "/reset-password/*"
                 ).permitAll()
