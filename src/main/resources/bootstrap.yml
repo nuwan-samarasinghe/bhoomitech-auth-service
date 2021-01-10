@@ -1,6 +1,6 @@
 spring:
   cloud:
     config:
-      uri: http://localhost:12001
+      uri: http://54.175.165.177:12001
   profiles:
     active: local
