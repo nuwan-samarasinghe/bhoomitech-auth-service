@@ -65,6 +65,11 @@
             <version>${springfox-swagger-ui.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.xcodel</groupId>
+            <artifactId>lib-common</artifactId>
+            <version>2021.01-1</version>
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
