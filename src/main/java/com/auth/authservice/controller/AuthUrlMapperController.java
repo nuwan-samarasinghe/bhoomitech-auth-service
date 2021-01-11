@@ -50,7 +50,7 @@ public class AuthUrlMapperController {
     @GetMapping(value = "/oauth/confirm_access")
     public ModelAndView getAccessConfirmation(@ModelAttribute AuthorizationRequest clientAuth) throws Exception {
         AuthClientDetails authClientDetails = oauthClientDetailsService.loadClientByClientId(clientAuth.getClientId());
-        ModelAndView access_confirmation = new ModelAndView("access_confirmation");
+        ModelAndView access_confirmation = new ModelAndView("html/access_confirmation");
         access_confirmation.addObject("auth_request", clientAuth);
         access_confirmation.addObject("client", authClientDetails);
         return access_confirmation;

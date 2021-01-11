@@ -25,6 +25,11 @@ public class UserController {
         return userService.getUserById(userId);
     }
 
+    @GetMapping(value = "/forgot-password}")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        return ResponseEntity.ok("resetted");
+    }
+
     @PreAuthorize("hasRole('ROLE_admin')")
     @GetMapping(value = "/user/all")
     public List<User> getAllUsers() {
