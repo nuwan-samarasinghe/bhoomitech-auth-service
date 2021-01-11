@@ -36,9 +36,7 @@ public class User implements Serializable {
     private Boolean accountNonExpired;
     private Boolean accountNonLocked;
     private Boolean credentialsNonExpired;
-//
-//    @OneToOne(mappedBy = "userDetail")
-//    private UserDetail userDetail;
+    private String userMetaData;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinTable(name = "role_user",

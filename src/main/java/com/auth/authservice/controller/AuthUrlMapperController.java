@@ -1,24 +1,28 @@
 package com.auth.authservice.controller;
 
 import com.auth.authservice.model.AuthClientDetails;
+import com.auth.authservice.model.User;
 import com.auth.authservice.service.OauthClientDetailsService;
+import com.auth.authservice.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Objects;
 
 @Slf4j
 @Controller
 @SessionAttributes(types = AuthorizationRequest.class)
 public class AuthUrlMapperController {
-    private final OauthClientDetailsService oauthClientDetailsService;
 
-    public AuthUrlMapperController(OauthClientDetailsService oauthClientDetailsService) {
+    private final OauthClientDetailsService oauthClientDetailsService;
+    private final UserService userService;
+
+    public AuthUrlMapperController(OauthClientDetailsService oauthClientDetailsService, UserService userService) {
         this.oauthClientDetailsService = oauthClientDetailsService;
+        this.userService = userService;
     }
 
     @GetMapping("/login")
@@ -32,7 +36,8 @@ public class AuthUrlMapperController {
     }
 
     @GetMapping("/forgot-password")
-    String forgotPassword() {
+    String forgotPassword(@RequestParam(required = false) String email) {
+        userService.forgotPassword(email);
         return "html/forgot-password";
     }
 
@@ -41,10 +46,16 @@ public class AuthUrlMapperController {
         return "html/register";
     }
 
-    @GetMapping("/reset-password/{token}")
-    String resetPassword(@PathVariable("token") String token) {
-        System.out.println(token);
-        return "html/reset-password";
+    @GetMapping("/reset-password")
+    ModelAndView resetPassword(@RequestParam  String token) {
+        User user = userService.validateUserSecret(token, true);
+        ModelAndView modelAndView = new ModelAndView();
+        if (Objects.isNull(user)) {
+            modelAndView.setViewName("redirect:/login");
+        } else {
+            modelAndView.setViewName("html/reset-password");
+        }
+        return modelAndView;
     }
 
     @GetMapping(value = "/oauth/confirm_access")
