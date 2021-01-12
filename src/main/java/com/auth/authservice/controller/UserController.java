@@ -27,7 +27,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ROLE_admin') or hasRole('ROLE_operator')")
     @PostMapping(value = "/user")
-    public User getUserByUserName(@RequestBody String userName) {
+    public User getUserByUserName(@RequestParam("userName") String userName) {
         return userService.getUserByUserName(userName);
     }
 
