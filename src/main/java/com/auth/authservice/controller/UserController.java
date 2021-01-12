@@ -25,6 +25,12 @@ public class UserController {
         return userService.getUserById(userId);
     }
 
+    @PreAuthorize("hasRole('ROLE_admin') or hasRole('ROLE_operator')")
+    @GetMapping(value = "/user/{userName}")
+    public User getUserByUserName(@PathVariable String userName) {
+        return userService.getUserByUserName(userName);
+    }
+
     @PreAuthorize("hasRole('ROLE_admin')")
     @GetMapping(value = "/user/all")
     public List<User> getAllUsers() {
@@ -36,7 +42,6 @@ public class UserController {
     public ResponseEntity<String> createUsers(@RequestBody NewUserDocument newUserDocument) {
         return userService.createNewUser(newUserDocument);
     }
-
 
 
 }

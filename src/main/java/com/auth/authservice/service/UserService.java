@@ -178,4 +178,8 @@ public class UserService {
             return null;
         }
     }
+
+    public User getUserByUserName(String userName) {
+        return userRepository.findByUsername(userName).orElseGet(User::new);
+    }
 }
