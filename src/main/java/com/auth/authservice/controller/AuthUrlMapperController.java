@@ -32,7 +32,7 @@ public class AuthUrlMapperController {
 
     @GetMapping("/error")
     String errorPageUrl() {
-        return "html/error";
+        return "/error";
     }
 
     @GetMapping("/forgot-password")

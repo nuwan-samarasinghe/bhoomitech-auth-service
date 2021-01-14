@@ -58,8 +58,9 @@ public class UserService {
 
     public void createNewUser(UserDetailDocument userDetailDocument) {
         User user = new User();
-        user.setUsername(userDetailDocument.getUserName());
+        user.setUsername(userDetailDocument.getUsername());
         user.setPassword(passwordEncoder.encode(userDetailDocument.getPassword()));
+        user.setEmail(userDetailDocument.getEmail());
         user.setEnabled(Boolean.FALSE);
         user.setAccountNonExpired(Boolean.TRUE);
         user.setAccountNonLocked(Boolean.TRUE);
@@ -80,7 +81,7 @@ public class UserService {
         log.info("USER DETAIL : creation successful {}", savedDetail);
 
         // sending mail since new user created
-        sendActivateUserMail(savedUser);
+        sendActivateUserMail(user);
     }
 
     public User getUserById(Integer userId) {
@@ -114,11 +115,11 @@ public class UserService {
             StringBuilder mailBody = new StringBuilder();
             mailBody.append("Hello ").append(user.getUsername())
                     .append("\n")
-                    .append("please click the following link to activate your account")
+                    .append("please click the following link to reset your account password")
                     .append("\n")
-                    .append(String.format("%s/activate?token=", domainName))
+                    .append(String.format("%s/reset-password?token=", domainName))
                     .append(resetPwSecret);
-            sendMail(user.getUsername(), user.getEmail(), mailBody.toString(), "Activate your account");
+            sendMail(user.getUsername(), user.getEmail(), mailBody.toString(), "Reset you password");
         } catch (Exception e) {
             log.error("error occurred while performing forgot password", e);
             throw new AuthServiceException("Sorry, something went wrong", e);
@@ -137,11 +138,11 @@ public class UserService {
             StringBuilder mailBody = new StringBuilder();
             mailBody.append("Hello ").append(user.getUsername())
                     .append("\n")
-                    .append("please click the following link to reset your account password")
+                    .append("please click the following link to activate your account")
                     .append("\n")
-                    .append(String.format("%s/reset-password?token=", domainName))
+                    .append(String.format("%s/activate?token=", domainName))
                     .append(resetPwSecret);
-            sendMail(user.getUsername(), user.getEmail(), mailBody.toString(), "Reset you password");
+            sendMail(user.getUsername(), user.getEmail(), mailBody.toString(), "Activate your account");
         } catch (Exception e) {
             log.error("error occurred while performing forgot password", e);
             throw new AuthServiceException("Sorry, something went wrong", e);
@@ -178,7 +179,7 @@ public class UserService {
 
     public @NonNull User validateUserSecret(String secret, boolean validateOnly) {
         try {
-            String decodedValue = SecretUtil.decrypt(secret, SecretUtil.getKeyFromPassword("X)0DEL", "ledocx"));
+            String decodedValue = SecretUtil.decode(secret);
             // check decoded value contains the secret seperator
             if (!decodedValue.contains(secretSeparator)) {
                 throw new AuthServiceException("Invalid secret code");

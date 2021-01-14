@@ -24,7 +24,7 @@ public class AuthUtil {
         // setting secret preference to new user
         UserMetaData.Secret secret = new UserMetaData().new Secret();
         String secretSuffix = String.valueOf(Math.random());
-        String secretWithUserInfo = SecretUtil.encrypt(String.format("%s%s%s", userName, secretSeparator, secretSuffix), SecretUtil.getKeyFromPassword("X)0DEL", "ledocx"));
+        String secretWithUserInfo = SecretUtil.encode(String.format("%s%s%s", userName, secretSeparator, secretSuffix));
         secret.setValidAfter(new Timestamp(System.currentTimeMillis()));
         Instant instant = Instant.now().plus(24, ChronoUnit.HOURS);
         secret.setValidBefore(Timestamp.from(instant));

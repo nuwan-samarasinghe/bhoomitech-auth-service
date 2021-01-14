@@ -16,9 +16,9 @@ public class UserDetail implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
+    @Column(unique = true)
     private String email;
 
-    @Column(unique = true)
     private String name;
 
     private String address;

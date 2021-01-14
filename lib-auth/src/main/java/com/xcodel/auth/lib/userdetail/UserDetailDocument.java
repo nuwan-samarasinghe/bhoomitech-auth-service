@@ -21,7 +21,7 @@ public class UserDetailDocument {
 
     private String organization;
 
-    private String userName;
+    private String username;
 
     private String password;
 
