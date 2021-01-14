@@ -1,12 +1,15 @@
 package com.auth.authservice.service;
 
-import com.auth.authservice.apidocs.NewUserDocument;
+import com.auth.authservice.exception.AuthServiceException;
 import com.auth.authservice.model.User;
+import com.auth.authservice.model.UserDetail;
 import com.auth.authservice.model.UserMetaData;
+import com.auth.authservice.repository.UserDetailRepository;
 import com.auth.authservice.repository.UserRepository;
 import com.auth.authservice.repository.UserRoleRepository;
 import com.auth.authservice.util.AuthUtil;
 import com.google.gson.Gson;
+import com.xcodel.auth.lib.userdetail.UserDetailDocument;
 import com.xcodel.commons.mail.MailService;
 import com.xcodel.commons.mail.model.Email;
 import com.xcodel.commons.mail.model.MailConfiguration;
@@ -21,7 +24,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -29,6 +34,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserDetailRepository userDetailRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -36,32 +42,45 @@ public class UserService {
     private String domainName = "http://localhost:12002";
     private String secretSeparator = "somethinfornow";
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserRoleRepository userRoleRepository) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       UserRoleRepository userRoleRepository,
+                       UserDetailRepository userDetailRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userRoleRepository = userRoleRepository;
+        this.userDetailRepository = userDetailRepository;
     }
 
     public List<User> getAllUsers() {
         return this.userRepository.findAll();
     }
 
-    public ResponseEntity<String> createNewUser(NewUserDocument newUserDocument) {
+    public void createNewUser(UserDetailDocument userDetailDocument) {
         User user = new User();
-        user.setUsername(newUserDocument.getUserName());
-        user.setPassword(passwordEncoder.encode(newUserDocument.getPassword()));
-        user.setEnabled(Boolean.TRUE);
+        user.setUsername(userDetailDocument.getUserName());
+        user.setPassword(passwordEncoder.encode(userDetailDocument.getPassword()));
+        user.setEnabled(Boolean.FALSE);
         user.setAccountNonExpired(Boolean.TRUE);
         user.setAccountNonLocked(Boolean.TRUE);
         user.setCredentialsNonExpired(Boolean.TRUE);
-        user.setRoles(this.userRoleRepository.findAllById(newUserDocument.getRoleIds()));
-        User saveUser = this.userRepository.save(user);
-//        log.info("USER : creation success full {}", saveUser);
-        if (saveUser.getId() != null) {
-            return ResponseEntity.ok("user created");
-        } else {
-            return ResponseEntity.ok("user not created");
-        }
+        user.setRoles(this.userRoleRepository.findAllById(Collections.singleton(2)));
+        User savedUser = this.userRepository.save(user);
+        log.info("USER : creation successful {}", savedUser);
+
+        // creating user details
+        UserDetail userDetail = new UserDetail();
+        userDetail.setUser(savedUser);
+        userDetail.setName(userDetailDocument.getName());
+        userDetail.setAddress(userDetailDocument.getAddress());
+        userDetail.setOrganization(userDetailDocument.getOrganization());
+        userDetail.setTelephone(userDetailDocument.getTelephone());
+        userDetail.setEmail(userDetailDocument.getEmail());
+        UserDetail savedDetail = this.userDetailRepository.save(userDetail);
+        log.info("USER DETAIL : creation successful {}", savedDetail);
+
+        // sending mail since new user created
+        sendActivateUserMail(savedUser);
     }
 
     public User getUserById(Integer userId) {
@@ -69,40 +88,67 @@ public class UserService {
         return userOptional.orElse(null);
     }
 
-    public @Nullable
-    String forgotPassword(@Nullable String email) {
+    public boolean forgotPassword(@Nullable String email) {
         if (StringUtils.isEmpty(email)) {
-            return null;
+            return false;
         }
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            try {
-                UserMetaData userMetaData = AuthUtil.convertJsonStringToUserMetaData(user.getUserMetaData());
-                String resetPwSecret = AuthUtil.generateUserSecret(user.getUsername(),
-                        secretSeparator,
-                        userMetaData);
-                user.setUserMetaData(AuthUtil.convertUserMetaDataToJsonString(userMetaData));
-                userRepository.save(user);
-
-                StringBuilder mailBody = new StringBuilder();
-                mailBody.append("Hello ").append(user.getUsername())
-                        .append("\n")
-                        .append("please click the following link to reset your account password")
-                        .append("\n")
-                        .append(String.format("%s/reset-password/", domainName))
-                        .append(resetPwSecret);
-                sendMail(user.getUsername(), user.getEmail(), mailBody.toString());
-            } catch (Exception e) {
-                throw new RuntimeException("something went wrong");
-            }
-
+            sendForgotPasswordMail(user);
+        } else {
+            throw new AuthServiceException("Sorry, We couldn't find your account.");
         }
-
-        return null;
+        return true;
     }
 
-    private Boolean sendMail(@NonNull String userName, @NonNull String emailAddress, @NonNull String body) {
+    private void sendForgotPasswordMail(User user) {
+        try {
+            UserMetaData userMetaData = AuthUtil.convertJsonStringToUserMetaData(user.getUserMetaData());
+            String resetPwSecret = AuthUtil.generateUserSecret(user.getUsername(),
+                    secretSeparator,
+                    userMetaData);
+            user.setUserMetaData(AuthUtil.convertUserMetaDataToJsonString(userMetaData));
+            userRepository.save(user);
+
+            StringBuilder mailBody = new StringBuilder();
+            mailBody.append("Hello ").append(user.getUsername())
+                    .append("\n")
+                    .append("please click the following link to activate your account")
+                    .append("\n")
+                    .append(String.format("%s/activate?token=", domainName))
+                    .append(resetPwSecret);
+            sendMail(user.getUsername(), user.getEmail(), mailBody.toString(), "Activate your account");
+        } catch (Exception e) {
+            log.error("error occurred while performing forgot password", e);
+            throw new AuthServiceException("Sorry, something went wrong", e);
+        }
+    }
+
+    private void sendActivateUserMail(User user) {
+        try {
+            UserMetaData userMetaData = AuthUtil.convertJsonStringToUserMetaData(user.getUserMetaData());
+            String resetPwSecret = AuthUtil.generateUserSecret(user.getUsername(),
+                    secretSeparator,
+                    userMetaData);
+            user.setUserMetaData(AuthUtil.convertUserMetaDataToJsonString(userMetaData));
+            userRepository.save(user);
+
+            StringBuilder mailBody = new StringBuilder();
+            mailBody.append("Hello ").append(user.getUsername())
+                    .append("\n")
+                    .append("please click the following link to reset your account password")
+                    .append("\n")
+                    .append(String.format("%s/reset-password?token=", domainName))
+                    .append(resetPwSecret);
+            sendMail(user.getUsername(), user.getEmail(), mailBody.toString(), "Reset you password");
+        } catch (Exception e) {
+            log.error("error occurred while performing forgot password", e);
+            throw new AuthServiceException("Sorry, something went wrong", e);
+        }
+    }
+
+    private Boolean sendMail(@NonNull String userName, @NonNull String emailAddress, @NonNull String body, String subject) {
         MailConfiguration mailConfiguration = new MailConfiguration();
         mailConfiguration.setSmtpHost("mail.bhoomitech.com");
         mailConfiguration.setSmtpPort(25);
@@ -114,7 +160,7 @@ public class UserService {
         email.setToEmail(emailAddress);
         email.setFromName("Bhoomitech");
         email.setFromEmail("gnsspp@bhoomitech.com");
-        email.setSubject("Reset you password");
+        email.setSubject(subject);
         email.setBody(body);
 
         return MailService.getMailService(mailConfiguration).sendMail(email);
@@ -126,7 +172,7 @@ public class UserService {
             UserMetaData userMetaData = AuthUtil.convertJsonStringToUserMetaData(user.getUserMetaData());
             return new ResponseEntity<>(new Gson().toJson(userMetaData.getSecret()), HttpStatus.OK);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Invalid request " + e.getMessage());
+            throw new AuthServiceException("");
         }
     }
 
@@ -135,51 +181,80 @@ public class UserService {
             String decodedValue = SecretUtil.decrypt(secret, SecretUtil.getKeyFromPassword("X)0DEL", "ledocx"));
             // check decoded value contains the secret seperator
             if (!decodedValue.contains(secretSeparator)) {
-                throw new RuntimeException("Invalid secret code");
+                throw new AuthServiceException("Invalid secret code");
             }
             String[] splitSecret = decodedValue.split(secretSeparator);
             String userName = splitSecret[0];
             Optional<User> userOptional = userRepository.findByUsername(userName);
             // username should be exists
             if (!userOptional.isPresent()) {
-                throw new RuntimeException("Invalid secret code");
+                throw new AuthServiceException("Invalid secret code");
             }
 
             User user = userOptional.get();
             // check preferences available for the user
             if (StringUtils.isEmpty(user.getUserMetaData())) {
-                throw new RuntimeException("Invalid user for secret");
+                throw new AuthServiceException("Invalid user for secret");
             }
 
             UserMetaData userMetaData = AuthUtil.convertJsonStringToUserMetaData(user.getUserMetaData());
             // secret code should be match for activate user
             if (!StringUtils.equals(splitSecret[1], userMetaData.getSecret().getSecret())) {
-                throw new RuntimeException("Invalid user for secret");
+                throw new AuthServiceException("Invalid user for secret");
             }
             // secret code should not be expired for secret
             Timestamp now = new Timestamp(System.currentTimeMillis());
             if (now.before(userMetaData.getSecret().getValidAfter())
                     || now.after(userMetaData.getSecret().getValidBefore())
                     || !userMetaData.getSecret().isValid()) {
-                throw new RuntimeException("Your secret code is expired");
+                throw new AuthServiceException("Your secret code is expired");
             }
 
             // invalidating secret code
             if (!validateOnly) {
                 userMetaData.getSecret().setValid(false);
                 user.setUserMetaData(AuthUtil.convertUserMetaDataToJsonString(userMetaData));
+                user.setEnabled(Boolean.TRUE);
                 return userRepository.save(user);
             }
-
             return user;
-
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            log.error("error on decrypting forgot password token", e);
+            throw new AuthServiceException("Sorry, something went wrong");
         }
     }
 
     public User getUserByUserName(String userName) {
         return userRepository.findByUsername(userName).orElseGet(User::new);
+    }
+
+    public void validateNewUser(UserDetailDocument userDetailDocument) {
+        if (Objects.isNull(userDetailDocument)) {
+            throw new AuthServiceException("Insufficient data to process.");
+        }
+        if (StringUtils.isEmpty(userDetailDocument.getName())) {
+            throw new AuthServiceException("Name cannot be empty");
+        }
+        if (StringUtils.isEmpty(userDetailDocument.getEmail())) {
+            throw new AuthServiceException("Email cannot be empty");
+        }
+        if (StringUtils.isEmpty(userDetailDocument.getPassword())) {
+            throw new AuthServiceException("Password cannot be empty");
+        }
+        if (!StringUtils.equals(userDetailDocument.getPassword(), userDetailDocument.getConfirmPassword())) {
+            throw new AuthServiceException("Password does not match");
+        }
+    }
+
+    public void updatePassword(User user, String password, String confirmPassword) {
+        if (StringUtils.isEmpty(password)) {
+            throw new AuthServiceException("Invalid password");
+        }
+        if (!StringUtils.equals(password, confirmPassword)) {
+            throw new AuthServiceException("password does not match");
+        }
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        log.info("USER: updated the password {}", user);
     }
 }

@@ -23,20 +23,20 @@
 </head>
 <body>
 <div class="form-design">
-    <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        Sorry, Something went wrong..
+    <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div th:if="${param.sucess}" class="alert alert-success alert-dismissible fade show" role="alert">
-        Your account has bee created
+        Your account has been created.
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <h2 class="font-white">Create Your Account</h2>
-    <form class="md-form" style="color: #192c34;" th:action="@{/login}" method="post">
+    <h2 class="font-black">Create Your Account</h2>
+    <form class="md-form" style="color: #192c34;" th:action="@{/register}" method="post">
         <div class="text-center">
             <img th:src="@{/img/logo.png}" class="logo" alt="Avatar">
         </div>
@@ -57,7 +57,7 @@
                    required>
         </div>
         <div class="form-group">
-            <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="New Password" required>
+            <input type="password" id="password" name="password" class="form-control" placeholder="New Password" required>
         </div>
         <div class="form-group">
             <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm Password" required>
@@ -69,7 +69,7 @@
             <label class="float-left form-check-label"><input type="checkbox"> I accept term & conditions</label>
         </div>
     </form>
-    <p class="text-center font-white">Already have an account? <a th:href="@{/login}">Sign In </a></p>
+    <p class="text-center font-black">Already have an account? <a th:href="@{/login}">Sign In </a></p>
 </div>
 </body>
 </html>

@@ -37,6 +37,7 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/webjars/**",
                         "/register",
                         "/error",
+                        "/activate",
                         "/oauth/*",
                         "/forgot-password",
                         "/reset-password"

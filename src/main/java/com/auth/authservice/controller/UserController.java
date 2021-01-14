@@ -37,11 +37,11 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PreAuthorize("hasRole('ROLE_admin')")
-    @PostMapping(value = "/user/create")
-    public ResponseEntity<String> createUsers(@RequestBody NewUserDocument newUserDocument) {
-        return userService.createNewUser(newUserDocument);
-    }
+//    @PreAuthorize("hasRole('ROLE_admin')")
+//    @PostMapping(value = "/user/create")
+//    public ResponseEntity<String> createUsers(@RequestBody NewUserDocument newUserDocument) {
+//        return userService.createNewUser(newUserDocument);
+//    }
 
 
 }
