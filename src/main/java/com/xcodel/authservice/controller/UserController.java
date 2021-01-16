@@ -1,5 +1,6 @@
 package com.xcodel.authservice.controller;
 
+import com.xcodel.auth.lib.userdetail.UserDetailDocument;
 import com.xcodel.authservice.model.User;
 import com.xcodel.authservice.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,7 +32,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ROLE_admin')")
     @GetMapping(value = "/user/all")
-    public List<User> getAllUsers() {
+    public List<UserDetailDocument> getAllUsers() {
         return userService.getAllUsers();
     }
 

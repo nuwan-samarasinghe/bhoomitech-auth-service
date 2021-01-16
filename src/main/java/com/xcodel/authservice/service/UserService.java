@@ -24,10 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -52,8 +49,21 @@ public class UserService {
         this.userDetailRepository = userDetailRepository;
     }
 
-    public List<User> getAllUsers() {
-        return this.userRepository.findAll();
+    public List<UserDetailDocument> getAllUsers() {
+        final List<UserDetailDocument> userDetailDocuments = new ArrayList<>();
+        List<User> allUsers = this.userRepository.findAll();
+        allUsers.forEach(user -> userDetailRepository.findByUser(user)
+                .ifPresent(userDetail -> {
+                    UserDetailDocument userDetailDocument = new UserDetailDocument();
+                    userDetailDocument.setUsername(userDetail.getUser().getUsername());
+                    userDetailDocument.setEmail(userDetail.getUser().getEmail());
+                    userDetailDocument.setName(userDetail.getName());
+                    userDetailDocument.setTelephone(userDetail.getTelephone());
+                    userDetailDocument.setOrganization(userDetail.getOrganization());
+                    userDetailDocument.setStatus(userDetail.getUser().getEnabled() ? "ACTIVE" : "INACTIVE");
+                    userDetailDocuments.add(userDetailDocument);
+                }));
+        return userDetailDocuments;
     }
 
     public void createNewUser(UserDetailDocument userDetailDocument) {
