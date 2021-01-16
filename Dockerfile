@@ -9,7 +9,7 @@ ARG JAR_FILE=./target/auth-service-2021.1-1.jar
 
 # Add the application's jar to the container
 ADD ${JAR_FILE} auth-service-2021.1-1.jar
-AuthUtil.java:44
+
 # make entry point
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/auth-service-2021.1-1.jar"]
 

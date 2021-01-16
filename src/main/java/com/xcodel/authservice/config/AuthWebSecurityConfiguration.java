@@ -42,6 +42,7 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/forgot-password",
                         "/reset-password"
                 ).permitAll()
+                .antMatchers("/auth/user/**").permitAll()
                 .antMatchers("/**").authenticated()
                 .and()
                 .formLogin().loginPage("/login").permitAll();
