@@ -5,13 +5,13 @@ FROM openjdk:8-jdk-alpine
 EXPOSE 12002
 
 # The application's jar file
-ARG JAR_FILE=./target/auth-service-0.0.1-SNAPSHOT.jar
+ARG JAR_FILE=./target/auth-service-2021.1-1.jar
 
 # Add the application's jar to the container
-ADD ${JAR_FILE} auth-service-0.0.1-SNAPSHOT.jar
-
+ADD ${JAR_FILE} auth-service-2021.1-1.jar
+AuthUtil.java:44
 # make entry point
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/auth-service-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/auth-service-2021.1-1.jar"]
 
 # Run the jar file
-CMD ["java -Djava.security.egd=file:/dev/./urandom -jar /auth-service-0.0.1-SNAPSHOT.jar"]
+CMD ["java -Djava.security.egd=file:/dev/./urandom -jar /auth-service-2021.1-1.jar"]
