@@ -38,7 +38,6 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/register",
                         "/error",
                         "/activate",
-                        "/oauth/*",
                         "/forgot-password",
                         "/reset-password"
                 ).permitAll()

@@ -1,5 +1,7 @@
 package com.xcodel.authservice.service;
 
+import com.google.gson.Gson;
+import com.xcodel.auth.lib.userdetail.UserDetailDocument;
 import com.xcodel.authservice.exception.AuthServiceException;
 import com.xcodel.authservice.model.User;
 import com.xcodel.authservice.model.UserDetail;
@@ -8,8 +10,6 @@ import com.xcodel.authservice.repository.UserDetailRepository;
 import com.xcodel.authservice.repository.UserRepository;
 import com.xcodel.authservice.repository.UserRoleRepository;
 import com.xcodel.authservice.util.AuthUtil;
-import com.google.gson.Gson;
-import com.xcodel.auth.lib.userdetail.UserDetailDocument;
 import com.xcodel.commons.mail.MailService;
 import com.xcodel.commons.mail.model.Email;
 import com.xcodel.commons.mail.model.MailConfiguration;
@@ -55,6 +55,7 @@ public class UserService {
         allUsers.forEach(user -> userDetailRepository.findByUser(user)
                 .ifPresent(userDetail -> {
                     UserDetailDocument userDetailDocument = new UserDetailDocument();
+                    userDetailDocument.setId(SecretUtil.encode(String.valueOf(user.getId())));
                     userDetailDocument.setUsername(userDetail.getUser().getUsername());
                     userDetailDocument.setEmail(userDetail.getUser().getEmail());
                     userDetailDocument.setName(userDetail.getName());
@@ -97,6 +98,31 @@ public class UserService {
     public User getUserById(Integer userId) {
         Optional<User> userOptional = this.userRepository.findById(userId);
         return userOptional.orElse(null);
+    }
+
+    public void activateUser(String encryptedUserID) {
+        User user = getUserFromEncryptedId(encryptedUserID);
+        user.setEnabled(Boolean.TRUE);
+        userRepository.save(user);
+    }
+
+    public void deactivateUser(String encryptedUserID) {
+        User user = getUserFromEncryptedId(encryptedUserID);
+        user.setEnabled(Boolean.FALSE);
+        userRepository.save(user);
+    }
+
+    private User getUserFromEncryptedId(String encryptedUserID) {
+        try {
+            String userId = SecretUtil.decode(encryptedUserID);
+            Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
+            if(optionalUser.isPresent()){
+                return optionalUser.get();
+            }
+            throw new AuthServiceException("Invalid user");
+        } catch (Exception e) {
+            throw new AuthServiceException("Sorry we cant process your request");
+        }
     }
 
     public boolean forgotPassword(@Nullable String email) {

@@ -9,7 +9,7 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class UserDetailDocument {
 
-    private Integer id;
+    private String id;
 
     private String email;
 

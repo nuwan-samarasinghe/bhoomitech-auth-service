@@ -3,6 +3,7 @@ package com.xcodel.authservice.controller;
 import com.xcodel.auth.lib.userdetail.UserDetailDocument;
 import com.xcodel.authservice.model.User;
 import com.xcodel.authservice.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +23,20 @@ public class UserController {
     @GetMapping(value = "/user/{userId}")
     public User getUserById(@PathVariable Integer userId) {
         return userService.getUserById(userId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_admin')")
+    @PutMapping(value = "/user/{userId}/activate")
+    public ResponseEntity activateUser(@PathVariable String userId) {
+        userService.activateUser(userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_admin')")
+    @PutMapping(value = "/user/{userId}/deactivate")
+    public ResponseEntity deactivateUser(@PathVariable String userId) {
+        userService.deactivateUser(userId);
+        return ResponseEntity.ok().build();
     }
 
     @PreAuthorize("hasRole('ROLE_admin') or hasRole('ROLE_operator')")
