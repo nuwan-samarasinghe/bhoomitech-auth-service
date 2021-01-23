@@ -1,0 +1,28 @@
+property-level: 'auth dev level'
+spring:
+  datasource:
+    url: jdbc:mysql://bhoomitech-dev.cyojzfaxldo6.us-east-1.rds.amazonaws.com:3306/boomitech_auth?createDatabaseIfNotExist=true
+    username: bhoomitech_rw
+    password: Bh00miTecH
+security:
+  oauth2:
+    resource:
+      token-info-uri: http://ec2-54-175-165-177.compute-1.amazonaws.com:12002/oauth/check_token
+    client:
+      client-id: web
+      client-secret: pin
+      access-token-uri: http://ec2-54-175-165-177.compute-1.amazonaws.com:12002/oauth/token
+      user-authorization-uri: http://ec2-54-175-165-177.compute-1.amazonaws.com:12002/oauth/authorize
+app:
+  custom-configs:
+    email:
+      name: BHOOMITECH GNS SYSTEM
+      address: noreply@bhoomitech.com
+      password: bUH!4Laur*DhFxVrEl
+      smtp-host: mail.bhoomitech.com
+      smtp-port: 587
+      forgot-password:
+        title: Reset you password
+        body: Hello {user_name}, \n please click the following link to reset your account password. \n {domain}/reset-password?token={token}
+
+

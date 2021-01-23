@@ -4,3 +4,6 @@ spring:
   cloud:
     config:
       uri: http://54.175.165.177:12001
+      enabled: false
+server:
+  port: 12002

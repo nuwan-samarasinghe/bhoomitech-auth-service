@@ -17,6 +17,7 @@ import com.xcodel.commons.secret.SecretUtil;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,8 +37,29 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final UserRoleRepository userRoleRepository;
-    private String domainName = "http://localhost:12002";
+    private String domainName = "http://ec2-54-175-165-177.compute-1.amazonaws.com:12002";
     private String secretSeparator = "somethinfornow";
+
+    @Value("${app.custom-configs.email.name}")
+    private String name;
+
+    @Value("${app.custom-configs.email.address}")
+    private String emailAddress;
+
+    @Value("${app.custom-configs.email.password}")
+    private String emailPassword;
+
+    @Value("${app.custom-configs.email.smtp-host}")
+    private String smtpHost;
+
+    @Value("${app.custom-configs.email.smtp-port}")
+    private Integer smtpPort;
+
+    @Value("${app.custom-configs.email.forgot-password.subject}")
+    private String forgotPasswordSubject;
+
+    @Value("${app.custom-configs.email.forgot-password.body}")
+    private String forgotPasswordBody;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
@@ -185,18 +207,18 @@ public class UserService {
         }
     }
 
-    private Boolean sendMail(@NonNull String userName, @NonNull String emailAddress, @NonNull String body, String subject) {
+    private Boolean sendMail(@NonNull String userName, @NonNull String toEmail, @NonNull String body, String subject) {
         MailConfiguration mailConfiguration = new MailConfiguration();
-        mailConfiguration.setSmtpHost("mail.bhoomitech.com");
-        mailConfiguration.setSmtpPort(25);
-        mailConfiguration.setSmtpUserName("gnsspp@bhoomitech.com");
-        mailConfiguration.setSmtpPassword("D,ISp~BBujlt}(k4E?");
+        mailConfiguration.setSmtpHost(smtpHost);
+        mailConfiguration.setSmtpPort(smtpPort);
+        mailConfiguration.setSmtpUserName(emailAddress);
+        mailConfiguration.setSmtpPassword(emailPassword);
 
         Email email = new Email();
         email.setToName(userName);
-        email.setToEmail(emailAddress);
-        email.setFromName("Bhoomitech");
-        email.setFromEmail("gnsspp@bhoomitech.com");
+        email.setToEmail(toEmail);
+        email.setFromName(name);
+        email.setFromEmail(emailAddress);
         email.setSubject(subject);
         email.setBody(body);
 
