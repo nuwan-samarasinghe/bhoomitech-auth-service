@@ -5,7 +5,7 @@ import com.xcodel.authservice.model.AuthClientDetails;
 import com.xcodel.authservice.model.User;
 import com.xcodel.authservice.service.OauthClientDetailsService;
 import com.xcodel.authservice.service.UserService;
-import com.xcodel.auth.lib.userdetail.UserDetailDocument;
+import com.xcodel.commons.auth.userdetail.UserDetailDocument;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.stereotype.Controller;

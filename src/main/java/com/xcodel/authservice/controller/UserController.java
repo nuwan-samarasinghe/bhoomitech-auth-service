@@ -1,8 +1,8 @@
 package com.xcodel.authservice.controller;
 
-import com.xcodel.auth.lib.userdetail.UserDetailDocument;
 import com.xcodel.authservice.model.User;
 import com.xcodel.authservice.service.UserService;
+import com.xcodel.commons.auth.userdetail.UserDetailDocument;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

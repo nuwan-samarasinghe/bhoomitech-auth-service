@@ -1,7 +1,6 @@
 package com.xcodel.authservice.service;
 
 import com.google.gson.Gson;
-import com.xcodel.auth.lib.userdetail.UserDetailDocument;
 import com.xcodel.authservice.exception.AuthServiceException;
 import com.xcodel.authservice.model.User;
 import com.xcodel.authservice.model.UserDetail;
@@ -10,6 +9,7 @@ import com.xcodel.authservice.repository.UserDetailRepository;
 import com.xcodel.authservice.repository.UserRepository;
 import com.xcodel.authservice.repository.UserRoleRepository;
 import com.xcodel.authservice.util.AuthUtil;
+import com.xcodel.commons.auth.userdetail.UserDetailDocument;
 import com.xcodel.commons.mail.MailService;
 import com.xcodel.commons.mail.model.Email;
 import com.xcodel.commons.mail.model.MailConfiguration;
@@ -116,7 +116,7 @@ public class UserService {
         try {
             String userId = SecretUtil.decode(encryptedUserID);
             Optional<User> optionalUser = userRepository.findById(Integer.parseInt(userId));
-            if(optionalUser.isPresent()){
+            if (optionalUser.isPresent()) {
                 return optionalUser.get();
             }
             throw new AuthServiceException("Invalid user");

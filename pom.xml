@@ -12,7 +12,7 @@
     <artifactId>auth-service</artifactId>
     <version>2021.1-1</version>
     <name>auth-service</name>
-    <description>Authentication service for the synergy bio application</description>
+    <description>Authentication service</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -20,12 +20,14 @@
         <spring-cloud.version>Hoxton.SR5</spring-cloud.version>
         <springfox-swagger-ui.version>2.9.2</springfox-swagger-ui.version>
         <gson.version>2.8.5</gson.version>
+        <lib-common.version>2021.01-1</lib-common.version>
+        <lombok.version>1.18.16</lombok.version>
     </properties>
 
     <repositories>
         <repository>
             <id>xcodel-repo</id>
-            <name>My Bitbucket maven repository</name>
+            <name>Excodel maven repository</name>
             <url>https://bitbucket.org/xcodel/xcodel-repo/src/master/</url>
             <layout>default</layout>
         </repository>
@@ -77,12 +79,7 @@
         <dependency>
             <groupId>com.xcodel</groupId>
             <artifactId>lib-common</artifactId>
-            <version>2021.01-1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.xcodel.auth</groupId>
-            <artifactId>lib-auth</artifactId>
-            <version>2021.1-1</version>
+            <version>${lib-common.version}</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -92,7 +89,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.16</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
