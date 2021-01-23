@@ -94,11 +94,11 @@ public class AuthUrlMapperController {
     }
 
     @PostMapping("/reset-password")
-    RedirectView resetPassword(@RequestParam String token, @ModelAttribute String password, @ModelAttribute String confirmPassword, RedirectAttributes redirectAttrs) {
+    RedirectView resetPassword(@RequestParam String token, @RequestParam String newPassword, @RequestParam String confirmPassword, RedirectAttributes redirectAttrs) {
         RedirectView modelAndView = new RedirectView("/reset-password", true);
         try {
             User user = userService.validateUserSecret(token, true);
-            userService.updatePassword(user, password, confirmPassword);
+            userService.updatePassword(user, newPassword, confirmPassword);
             modelAndView = new RedirectView("/login", true);
             redirectAttrs.addFlashAttribute("success", "You've successfully updated the password");
         } catch (AuthServiceException exception) {

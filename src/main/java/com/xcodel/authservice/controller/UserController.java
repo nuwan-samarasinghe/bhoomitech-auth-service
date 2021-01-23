@@ -5,8 +5,11 @@ import com.xcodel.authservice.service.UserService;
 import com.xcodel.commons.auth.userdetail.UserDetailDocument;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -48,7 +51,8 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_admin')")
     @GetMapping(value = "/user/all")
     public List<UserDetailDocument> getAllUsers() {
-        return userService.getAllUsers();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userService.getAllUsers(authentication.getName());
     }
 
 //    @PreAuthorize("hasRole('ROLE_admin')")

@@ -83,10 +83,12 @@ public class UserService {
         this.userDetailRepository = userDetailRepository;
     }
 
-    public List<UserDetailDocument> getAllUsers() {
+    public List<UserDetailDocument> getAllUsers(String accessedUser) {
         final List<UserDetailDocument> userDetailDocuments = new ArrayList<>();
         List<User> allUsers = this.userRepository.findAll();
-        allUsers.forEach(user -> userDetailRepository.findByUser(user)
+        allUsers.stream()
+                .filter(user -> !StringUtils.equals(user.getUsername(), accessedUser))
+                .forEach(user -> userDetailRepository.findByUser(user)
                 .ifPresent(userDetail -> {
                     UserDetailDocument userDetailDocument = new UserDetailDocument();
                     userDetailDocument.setId(SecretUtil.encode(String.valueOf(user.getId())));
