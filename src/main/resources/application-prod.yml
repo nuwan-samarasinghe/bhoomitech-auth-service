@@ -8,9 +8,28 @@ spring:
 security:
   oauth2:
     resource:
-      token-info-uri: http://localhost:12002/oauth/check_token
+      token-info-uri: http://ec2-54-175-165-177.compute-1.amazonaws.com:12002/oauth/check_token
     client:
       client-id: web
       client-secret: pin
-      access-token-uri: http://localhost:12002/oauth/token
-      user-authorization-uri: http://localhost:12002/oauth/authorize
+      access-token-uri: http://ec2-54-175-165-177.compute-1.amazonaws.com:12002/oauth/token
+      user-authorization-uri: http://ec2-54-175-165-177.compute-1.amazonaws.com:12002/oauth/authorize
+app:
+  custom-configs:
+    email:
+      name: BHOOMITECH GNS SYSTEM
+      address: noreply@bhoomitech.com
+      password: bUH!4Laur*DhFxVrEl
+      smtp-host: mail.bhoomitech.com
+      smtp-port: 587
+      reset-password:
+        subject: Reset you password
+        body: Hello {user_name}, please click the following link to reset your account password.
+        url: http://ec2-54-175-165-177.compute-1.amazonaws.com:12002/reset-password?token={token}
+      activate:
+        subject: Activate your account
+        body: Hello {user_name}, please click the following link to activate your account.
+        url: http://ec2-54-175-165-177.compute-1.amazonaws.com:12002/activate?token={token}
+
+
+

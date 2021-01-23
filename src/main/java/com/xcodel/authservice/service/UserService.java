@@ -55,11 +55,23 @@ public class UserService {
     @Value("${app.custom-configs.email.smtp-port}")
     private Integer smtpPort;
 
-    @Value("${app.custom-configs.email.forgot-password.subject}")
-    private String forgotPasswordSubject;
+    @Value("${app.custom-configs.email.reset-password.subject}")
+    private String resetPasswordSubject;
 
-    @Value("${app.custom-configs.email.forgot-password.body}")
-    private String forgotPasswordBody;
+    @Value("${app.custom-configs.email.reset-password.body}")
+    private String resetPasswordBody;
+
+    @Value("${app.custom-configs.email.reset-password.url}")
+    private String resetPasswordUrl;
+
+    @Value("${app.custom-configs.email.activate.subject}")
+    private String activateAccountSubject;
+
+    @Value("${app.custom-configs.email.activate.body}")
+    private String activateAccountBody;
+
+    @Value("${app.custom-configs.email.activate.url}")
+    private String activateAccountUrl;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
@@ -171,13 +183,10 @@ public class UserService {
             userRepository.save(user);
 
             StringBuilder mailBody = new StringBuilder();
-            mailBody.append("Hello ").append(user.getUsername())
+            mailBody.append(resetPasswordBody.replace("{user_name}", user.getUsername()))
                     .append("\n")
-                    .append("please click the following link to reset your account password")
-                    .append("\n")
-                    .append(String.format("%s/reset-password?token=", domainName))
-                    .append(resetPwSecret);
-            sendMail(user.getUsername(), user.getEmail(), mailBody.toString(), "Reset you password");
+                    .append(resetPasswordUrl.replace("{token}", resetPwSecret));
+            sendMail(user.getUsername(), user.getEmail(), mailBody.toString(), resetPasswordSubject);
         } catch (Exception e) {
             log.error("error occurred while performing forgot password", e);
             throw new AuthServiceException("Sorry, something went wrong", e);
@@ -192,14 +201,10 @@ public class UserService {
                     userMetaData);
             user.setUserMetaData(AuthUtil.convertUserMetaDataToJsonString(userMetaData));
             userRepository.save(user);
-
             StringBuilder mailBody = new StringBuilder();
-            mailBody.append("Hello ").append(user.getUsername())
+            mailBody.append(activateAccountBody.replace("{user_name}", user.getUsername()))
                     .append("\n")
-                    .append("please click the following link to activate your account")
-                    .append("\n")
-                    .append(String.format("%s/activate?token=", domainName))
-                    .append(resetPwSecret);
+                    .append(activateAccountUrl.replace("{token}", resetPwSecret));
             sendMail(user.getUsername(), user.getEmail(), mailBody.toString(), "Activate your account");
         } catch (Exception e) {
             log.error("error occurred while performing forgot password", e);
@@ -222,7 +227,12 @@ public class UserService {
         email.setSubject(subject);
         email.setBody(body);
 
-        return MailService.getMailService(mailConfiguration).sendMail(email);
+        boolean success = MailService.getMailService(mailConfiguration).sendMail(email);
+        if (success)
+            log.info("email sent success to {}", toEmail);
+        else
+            log.error("email sent failed to {}", toEmail);
+        return success;
     }
 
     public @NonNull ResponseEntity resetPassword(@NonNull String secret) {
@@ -303,6 +313,19 @@ public class UserService {
         if (!StringUtils.equals(userDetailDocument.getPassword(), userDetailDocument.getConfirmPassword())) {
             throw new AuthServiceException("Password does not match");
         }
+        isValidPassword(userDetailDocument.getPassword());
+        // validate email exists
+        userRepository.findByEmail(userDetailDocument.getEmail())
+                .ifPresent(u -> {
+                    throw new AuthServiceException("This email already exists");
+                });
+        // validate username exists
+        userRepository.findByUsername(userDetailDocument.getUsername())
+                .ifPresent(u -> {
+                    throw new AuthServiceException("This username already taken");
+                });
+
+
     }
 
     public void updatePassword(User user, String password, String confirmPassword) {
@@ -312,8 +335,15 @@ public class UserService {
         if (!StringUtils.equals(password, confirmPassword)) {
             throw new AuthServiceException("password does not match");
         }
+        isValidPassword(password);
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
         log.info("USER: updated the password {}", user);
+    }
+
+    private void isValidPassword(@NonNull String password) {
+        if (password.length() < 8) {
+            throw new AuthServiceException("password should have at least 8 characters");
+        }
     }
 }

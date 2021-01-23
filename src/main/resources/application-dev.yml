@@ -4,6 +4,7 @@ spring:
     url: jdbc:mysql://bhoomitech-dev.cyojzfaxldo6.us-east-1.rds.amazonaws.com:3306/boomitech_auth?createDatabaseIfNotExist=true
     username: bhoomitech_rw
     password: Bh00miTecH
+    driver-class-name: com.mysql.cj.jdbc.Driver
 security:
   oauth2:
     resource:
@@ -21,8 +22,14 @@ app:
       password: bUH!4Laur*DhFxVrEl
       smtp-host: mail.bhoomitech.com
       smtp-port: 587
-      forgot-password:
-        title: Reset you password
-        body: Hello {user_name}, \n please click the following link to reset your account password. \n {domain}/reset-password?token={token}
+      reset-password:
+        subject: Reset you password
+        body: Hello {user_name}, please click the following link to reset your account password.
+        url: http://localhost:12002/reset-password?token={token}
+      activate:
+        subject: Activate your account
+        body: Hello {user_name}, please click the following link to activate your account.
+        url: http://localhost:12002/activate?token={token}
+
 
 

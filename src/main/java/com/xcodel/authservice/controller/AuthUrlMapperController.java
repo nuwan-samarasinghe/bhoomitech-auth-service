@@ -11,6 +11,8 @@ import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 @Slf4j
 @Controller
@@ -36,45 +38,50 @@ public class AuthUrlMapperController {
     }
 
     @GetMapping("/forgot-password")
-    ModelAndView forgotPassword(@RequestParam(required = false) String email) {
-        ModelAndView modelAndView = new ModelAndView("html/forgot-password");
+    String forgotPassword() {
+        return "html/forgot-password";
+    }
+
+    @GetMapping("/register")
+    String register() {
+        return "html/register";
+    }
+
+
+    @PostMapping("/forgot-password")
+    RedirectView forgotPassword(@RequestParam String email, RedirectAttributes redirectAttrs) {
+        RedirectView modelAndView = new RedirectView("/forgot-password", true);
         try {
             boolean success = userService.forgotPassword(email);
             if (success) {
-                modelAndView.setViewName("redirect:/login");
-                modelAndView.addObject("success", "we have sent a password reset link to your email.");
+                modelAndView = new RedirectView("/login", true);
+                redirectAttrs.addFlashAttribute("success", "we have sent a password reset link to your email.");
             }
         } catch (AuthServiceException exception) {
-            modelAndView.addObject("error", exception.getMessage());
+            redirectAttrs.addFlashAttribute("error", exception.getMessage());
         }
         return modelAndView;
     }
 
-    @GetMapping("/register")
-    ModelAndView register() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("html/register");
-        return modelAndView;
-    }
-
     @PostMapping("/register")
-    ModelAndView register(@ModelAttribute UserDetailDocument userDetailDocument) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("html/register");
+    RedirectView register(@ModelAttribute UserDetailDocument userDetailDocument, RedirectAttributes redirectAttrs) {
+        RedirectView modelAndView = new RedirectView("/register", true);
         try {
             userService.validateNewUser(userDetailDocument);
             // save user
             userService.createNewUser(userDetailDocument);
-            modelAndView.setViewName("redirect:/login");
-            modelAndView.addObject("success", "Your account got created, please verify your email to activate.");
+            modelAndView = new RedirectView("/login", true);
+            redirectAttrs.addFlashAttribute("success", "Your account got created, please verify your email to activate.");
+        } catch (AuthServiceException exception) {
+            redirectAttrs.addFlashAttribute("error", exception.getMessage());
         } catch (Exception exception) {
-            modelAndView.addObject("error", exception.getMessage());
+            redirectAttrs.addFlashAttribute("error", "Unexpected error occurred.");
         }
         return modelAndView;
     }
 
     @GetMapping("/reset-password")
-    ModelAndView resetPassword(@RequestParam String token) {
+    ModelAndView resetPassword(@RequestParam String token, RedirectAttributes redirectAttrs) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("html/reset-password");
         try {
@@ -87,23 +94,22 @@ public class AuthUrlMapperController {
     }
 
     @PostMapping("/reset-password")
-    ModelAndView resetPassword(@RequestParam String token, @ModelAttribute String password, @ModelAttribute String confirmPassword) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("html/reset-password");
+    RedirectView resetPassword(@RequestParam String token, @ModelAttribute String password, @ModelAttribute String confirmPassword, RedirectAttributes redirectAttrs) {
+        RedirectView modelAndView = new RedirectView("/reset-password", true);
         try {
             User user = userService.validateUserSecret(token, true);
             userService.updatePassword(user, password, confirmPassword);
-            modelAndView.setViewName("redirect:/login");
-            modelAndView.addObject("success", "You've successfully updated the password");
+            modelAndView = new RedirectView("/login", true);
+            redirectAttrs.addFlashAttribute("success", "You've successfully updated the password");
         } catch (AuthServiceException exception) {
-            modelAndView.setViewName("redirect:/login");
-            modelAndView.addObject("error", exception.getMessage());
+            modelAndView = new RedirectView("/login", true);
+            redirectAttrs.addFlashAttribute("error", exception.getMessage());
         }
         return modelAndView;
     }
 
     @GetMapping("/activate")
-    ModelAndView activateUser(@RequestParam String token) {
+    ModelAndView activateUser(@RequestParam String token, RedirectAttributes redirectAttrs) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("html/activate");
         try {
