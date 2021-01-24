@@ -22,7 +22,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PreAuthorize("hasRole('ROLE_admin')")
+    @PreAuthorize("hasRole('ROLE_admin', 'ROLE_operator')")
     @GetMapping(value = "/user/{userId}")
     public User getUserById(@PathVariable Integer userId) {
         return userService.getUserById(userId);
