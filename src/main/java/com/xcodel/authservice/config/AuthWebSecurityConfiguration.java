@@ -1,5 +1,6 @@
 package com.xcodel.authservice.config;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -15,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -63,17 +63,20 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/**").authenticated()
                 .and()
                 .formLogin().loginPage("/login")
+                .defaultSuccessUrl("/redirect")
                 .permitAll()
                 .and()
                 .logout(logout -> logout
                         .permitAll()
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
-                        .invalidateHttpSession(true)
                         .logoutSuccessHandler((request, response, authentication) -> {
                             DefaultTokenServices defaultTokenServices = this.tokenServices();
-                            defaultTokenServices.revokeToken(request.getHeader("authorization")
-                                    .replaceFirst("Bearer", "").trim());
+                            String authorization = request.getHeader("authorization");
+                            boolean inAuth = true;
+                            if (StringUtils.isNotEmpty(authorization)) {
+                                defaultTokenServices.revokeToken(authorization
+                                        .replaceFirst("Bearer", "").trim());
+                                inAuth = false;
+                            }
                             defaultTokenServices.setAccessTokenValiditySeconds(0);
                             defaultTokenServices.setRefreshTokenValiditySeconds(0);
                             HttpSession session;
@@ -82,8 +85,15 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                             if (session != null) {
                                 session.invalidate();
                             }
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        }));
+                            if (inAuth) {
+                                response.sendRedirect("/login");
+                            } else {
+                                response.setStatus(HttpServletResponse.SC_OK);
+                            }
+                        })
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
+                        .invalidateHttpSession(true));
     }
 
     @Bean
@@ -98,7 +108,7 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().and().userDetailsService(userDetailsService)
+        auth.userDetailsService(userDetailsService)
                 .passwordEncoder(getPasswordEncoder());
     }
 }

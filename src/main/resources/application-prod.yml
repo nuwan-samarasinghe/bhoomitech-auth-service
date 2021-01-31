@@ -22,6 +22,7 @@ logging:
         FilterChainProxy: DEBUG
 app:
   custom-configs:
+    default-login-redirect: http://ec2-54-175-165-177.compute-1.amazonaws.com
     email:
       name: BHOOMITECH GNS SYSTEM
       address: noreply@bhoomitech.com

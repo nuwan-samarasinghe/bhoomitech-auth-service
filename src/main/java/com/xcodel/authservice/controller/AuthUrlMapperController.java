@@ -7,6 +7,7 @@ import com.xcodel.authservice.service.OauthClientDetailsService;
 import com.xcodel.authservice.service.UserService;
 import com.xcodel.commons.auth.userdetail.UserDetailDocument;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,9 @@ import org.springframework.web.servlet.view.RedirectView;
 @SessionAttributes(types = AuthorizationRequest.class)
 public class AuthUrlMapperController {
 
+    @Value("${app.custom-configs.default-login-redirect}")
+    private String defaultLoginRedirect;
+
     private final OauthClientDetailsService oauthClientDetailsService;
     private final UserService userService;
 
@@ -30,6 +34,11 @@ public class AuthUrlMapperController {
     @GetMapping("/login")
     String loginUser() {
         return "html/login";
+    }
+
+    @GetMapping("/handle-logout")
+    String logout() {
+        return "html/handle-logout";
     }
 
     @GetMapping("/error")
@@ -49,7 +58,7 @@ public class AuthUrlMapperController {
 
     @RequestMapping(value = "/redirect", method = RequestMethod.GET)
     public ModelAndView method() {
-        return new ModelAndView("redirect:" + "http://localhost:3000");
+        return new ModelAndView("redirect:" + defaultLoginRedirect);
     }
 
     @PostMapping("/forgot-password")

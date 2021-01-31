@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layout}">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>GNSS Portal | BhoomiTech</title>
     <link rel="shortcut icon" type="image/png" th:href="@{/img/favicon.png}"/>
@@ -22,45 +21,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
-
 </head>
-<body onload="document.accessForm.submit()">
-
-
+<body onload="document.form.submit()">
 <div class="form-design">
-    <h2 class="font-black">Access Confirmation</h2>
-    <form class="md-form" style="color: #192c34;" action="/oauth/authorize" method="post" name="accessForm">
+    <h2 class="font-black">Your are about to signing off..</h2>
+    <form class="md-form" style="color: #192c34;" th:action="@{/logout}" method="post" name="form">
         <div class="text-center">
             <img th:src="@{/img/logo.png}" class="logo" alt="Avatar">
-        </div>
-        <p>Do you authorize <span th:text="${client.getClientId()}"></span> to
-            access your protected resources?
-        </p>
-        <div class="form-group">
-            <input name="user_oauth_approval" value="true" type="hidden"/>
-        </div>
-        <ul>
-            <li>
-                <div class="radio">
-                    <div class="form-group">
-                        READ:
-                        <input type="radio" name="scope.READ" value="true" checked=""/>Approve
-                        <input type="radio" name="scope.READ" value="false"/>Deny
-                    </div>
-                </div>
-            </li>
-            <li>
-                <div class="radio">
-                    <div class="form-group">
-                        WRITE:
-                        <input type="radio" name="scope.WRITE" value="true" checked="">Approve
-                        <input type="radio" name="scope.WRITE" value="false">Deny
-                    </div>
-                </div>
-            </li>
-        </ul>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block">Authorize</button>
         </div>
     </form>
 </div>
