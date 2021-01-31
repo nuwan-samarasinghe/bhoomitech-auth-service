@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -44,9 +45,8 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "**").permitAll()
-                .antMatchers(
-                        "/swagger-ui.html",
+                .antMatchers(HttpMethod.OPTIONS).permitAll()
+                .antMatchers("/swagger-ui.html",
                         "/css/*",
                         "/img/*",
                         "/js/*",
@@ -57,12 +57,13 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/error",
                         "/activate",
                         "/forgot-password",
-                        "/reset-password"
-                ).permitAll()
+                        "/reset-password").permitAll()
                 .antMatchers("/auth/user/**").permitAll()
+                .antMatchers("/auth/user").permitAll()
                 .antMatchers("/**").authenticated()
                 .and()
-                .formLogin().loginPage("/login").permitAll()
+                .formLogin().loginPage("/login")
+                .permitAll()
                 .and()
                 .logout(logout -> logout
                         .permitAll()
@@ -81,7 +82,7 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                             if (session != null) {
                                 session.invalidate();
                             }
-                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         }));
     }
 

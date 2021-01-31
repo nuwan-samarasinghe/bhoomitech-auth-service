@@ -14,6 +14,12 @@ security:
       client-secret: pin
       access-token-uri: http://ec2-54-175-165-177.compute-1.amazonaws.com:12002/oauth/token
       user-authorization-uri: http://ec2-54-175-165-177.compute-1.amazonaws.com:12002/oauth/authorize
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        FilterChainProxy: DEBUG
 app:
   custom-configs:
     email:

@@ -19,6 +19,8 @@ logging:
     org:
       springframework:
         web: DEBUG
+        security: DEBUG
+
 app:
   custom-configs:
     email:

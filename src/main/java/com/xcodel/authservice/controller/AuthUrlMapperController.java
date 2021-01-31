@@ -47,6 +47,10 @@ public class AuthUrlMapperController {
         return "html/register";
     }
 
+    @RequestMapping(value = "/redirect", method = RequestMethod.GET)
+    public ModelAndView method() {
+        return new ModelAndView("redirect:" + "http://localhost:3000");
+    }
 
     @PostMapping("/forgot-password")
     RedirectView forgotPassword(@RequestParam String email, RedirectAttributes redirectAttrs) {
