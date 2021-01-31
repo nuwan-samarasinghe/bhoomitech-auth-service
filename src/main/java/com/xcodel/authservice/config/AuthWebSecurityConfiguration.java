@@ -1,8 +1,8 @@
 package com.xcodel.authservice.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -12,11 +12,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -24,8 +22,21 @@ import javax.servlet.http.HttpSession;
 public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
 
-    public AuthWebSecurityConfiguration(UserDetailsService userDetailsService) {
+    private final TokenStore getTokenStore;
+
+    public AuthWebSecurityConfiguration(TokenStore getTokenStore,
+                                        UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
+        this.getTokenStore = getTokenStore;
+    }
+
+    @Bean
+    @Primary
+    public DefaultTokenServices tokenServices() {
+        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+        defaultTokenServices.setTokenStore(this.getTokenStore);
+        defaultTokenServices.setSupportRefreshToken(true);
+        return defaultTokenServices;
     }
 
     @Override
@@ -59,7 +70,12 @@ public class AuthWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true)
                         .logoutSuccessHandler((request, response, authentication) -> {
-                            HttpSession session = request.getSession(false);
+                            DefaultTokenServices defaultTokenServices = this.tokenServices();
+                            defaultTokenServices.revokeToken(request.getHeader("authorization")
+                                    .replaceFirst("Bearer", "").trim());
+                            defaultTokenServices.setAccessTokenValiditySeconds(0);
+                            defaultTokenServices.setRefreshTokenValiditySeconds(0);
+                            HttpSession session;
                             SecurityContextHolder.clearContext();
                             session = request.getSession(true);
                             if (session != null) {

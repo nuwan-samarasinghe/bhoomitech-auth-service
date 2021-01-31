@@ -1,6 +1,5 @@
 package com.xcodel.authservice.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,7 +9,6 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 
 import javax.sql.DataSource;
 
@@ -21,21 +19,20 @@ public class AuthorizationServerConfiguration implements AuthorizationServerConf
     private final DataSource dataSource;
     private final AuthenticationManager authenticationManager;
 
+    private final TokenStore getTokenStore;
+
     private final UserDetailsService userDetailsService;
 
     public AuthorizationServerConfiguration(
             PasswordEncoder passwordEncoder,
             DataSource dataSource,
+            TokenStore getTokenStore,
             AuthenticationManager authenticationManager, UserDetailsService userDetailsService) {
         this.passwordEncoder = passwordEncoder;
         this.dataSource = dataSource;
+        this.getTokenStore = getTokenStore;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
-    }
-
-    @Bean
-    TokenStore getTokenStore() {
-        return new JdbcTokenStore(dataSource);
     }
 
     @Override
@@ -52,6 +49,6 @@ public class AuthorizationServerConfiguration implements AuthorizationServerConf
     public void configure(AuthorizationServerEndpointsConfigurer endpoint) {
         endpoint.authenticationManager(this.authenticationManager);
         endpoint.userDetailsService(this.userDetailsService);
-        endpoint.tokenStore(getTokenStore());
+        endpoint.tokenStore(getTokenStore);
     }
 }
