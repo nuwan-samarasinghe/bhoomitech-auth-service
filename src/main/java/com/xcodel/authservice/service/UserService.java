@@ -89,17 +89,17 @@ public class UserService {
         allUsers.stream()
                 .filter(user -> !StringUtils.equals(user.getUsername(), accessedUser))
                 .forEach(user -> userDetailRepository.findByUser(user)
-                .ifPresent(userDetail -> {
-                    UserDetailDocument userDetailDocument = new UserDetailDocument();
-                    userDetailDocument.setId(SecretUtil.encode(String.valueOf(user.getId())));
-                    userDetailDocument.setUsername(userDetail.getUser().getUsername());
-                    userDetailDocument.setEmail(userDetail.getUser().getEmail());
-                    userDetailDocument.setName(userDetail.getName());
-                    userDetailDocument.setTelephone(userDetail.getTelephone());
-                    userDetailDocument.setOrganization(userDetail.getOrganization());
-                    userDetailDocument.setStatus(userDetail.getUser().getEnabled() ? "ACTIVE" : "INACTIVE");
-                    userDetailDocuments.add(userDetailDocument);
-                }));
+                        .ifPresent(userDetail -> {
+                            UserDetailDocument userDetailDocument = new UserDetailDocument();
+                            userDetailDocument.setId(SecretUtil.encode(String.valueOf(user.getId())));
+                            userDetailDocument.setUsername(userDetail.getUser().getUsername());
+                            userDetailDocument.setEmail(userDetail.getUser().getEmail());
+                            userDetailDocument.setName(userDetail.getName());
+                            userDetailDocument.setTelephone(userDetail.getTelephone());
+                            userDetailDocument.setOrganization(userDetail.getOrganization());
+                            userDetailDocument.setStatus(userDetail.getUser().getEnabled() ? "ACTIVE" : "INACTIVE");
+                            userDetailDocuments.add(userDetailDocument);
+                        }));
         return userDetailDocuments;
     }
 
@@ -131,8 +131,8 @@ public class UserService {
         sendActivateUserMail(user);
     }
 
-    public User getUserById(Integer userId) {
-        Optional<User> userOptional = this.userRepository.findById(userId);
+    public UserDetail getUserById(Integer userId) {
+        Optional<UserDetail> userOptional = this.userDetailRepository.findById(userId);
         return userOptional.orElse(null);
     }
 

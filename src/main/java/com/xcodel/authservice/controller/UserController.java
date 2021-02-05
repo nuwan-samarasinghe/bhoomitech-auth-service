@@ -1,6 +1,7 @@
 package com.xcodel.authservice.controller;
 
 import com.xcodel.authservice.model.User;
+import com.xcodel.authservice.model.UserDetail;
 import com.xcodel.authservice.service.UserService;
 import com.xcodel.commons.auth.userdetail.UserDetailDocument;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ROLE_admin') or hasRole('ROLE_operator')")
     @GetMapping(value = "/user/{userId}")
-    public User getUserById(@PathVariable Integer userId) {
+    public UserDetail getUserById(@PathVariable Integer userId) {
         return userService.getUserById(userId);
     }
 
