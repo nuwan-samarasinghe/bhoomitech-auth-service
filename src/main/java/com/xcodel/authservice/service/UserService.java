@@ -131,9 +131,23 @@ public class UserService {
         sendActivateUserMail(user);
     }
 
-    public UserDetail getUserById(Integer userId) {
-        Optional<UserDetail> userOptional = this.userDetailRepository.findById(userId);
-        return userOptional.orElse(null);
+    public UserDetailDocument getUserById(Integer userId) {
+        UserDetailDocument userDetailDocument = new UserDetailDocument();
+        Optional<User> userOptional = this.userRepository.findById(userId);
+
+        userOptional.ifPresent(user -> {
+            Optional<UserDetail> userDetailOptional = this.userDetailRepository.findByUser(user);
+            userDetailOptional.ifPresent(userDetail -> {
+                userDetailDocument.setId(SecretUtil.encode(String.valueOf(userDetail.getUser().getId())));
+                userDetailDocument.setUsername(userDetail.getUser().getUsername());
+                userDetailDocument.setEmail(userDetail.getUser().getEmail());
+                userDetailDocument.setName(userDetail.getName());
+                userDetailDocument.setTelephone(userDetail.getTelephone());
+                userDetailDocument.setOrganization(userDetail.getOrganization());
+                userDetailDocument.setStatus(userDetail.getUser().getEnabled() ? "ACTIVE" : "INACTIVE");
+            });
+        });
+        return userDetailDocument;
     }
 
     public void activateUser(String encryptedUserID) {

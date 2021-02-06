@@ -25,7 +25,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ROLE_admin') or hasRole('ROLE_operator')")
     @GetMapping(value = "/user/{userId}")
-    public UserDetail getUserById(@PathVariable Integer userId) {
+    public UserDetailDocument getUserById(@PathVariable Integer userId) {
         return userService.getUserById(userId);
     }
 

@@ -28,39 +28,40 @@
 
 
 <div class="form-design">
-    <h2 class="font-black">Access Confirmation</h2>
     <form class="md-form" style="color: #192c34;" action="/oauth/authorize" method="post" name="accessForm">
         <div class="text-center">
             <img th:src="@{/img/logo.png}" class="logo" alt="Avatar">
         </div>
-        <p>Do you authorize <span th:text="${client.getClientId()}"></span> to
-            access your protected resources?
+        <p>
+            Authentication success, redirecting to application..
         </p>
-        <div class="form-group">
-            <input name="user_oauth_approval" value="true" type="hidden"/>
-        </div>
-        <ul>
-            <li>
-                <div class="radio">
-                    <div class="form-group">
-                        READ:
-                        <input type="radio" name="scope.READ" value="true" checked=""/>Approve
-                        <input type="radio" name="scope.READ" value="false"/>Deny
+        <div style="display: none">
+            <div class="form-group">
+                <input name="user_oauth_approval" value="true" type="hidden"/>
+            </div>
+            <ul>
+                <li>
+                    <div class="radio">
+                        <div class="form-group">
+                            READ:
+                            <input type="radio" name="scope.READ" value="true" checked=""/>Approve
+                            <input type="radio" name="scope.READ" value="false"/>Deny
+                        </div>
                     </div>
-                </div>
-            </li>
-            <li>
-                <div class="radio">
-                    <div class="form-group">
-                        WRITE:
-                        <input type="radio" name="scope.WRITE" value="true" checked="">Approve
-                        <input type="radio" name="scope.WRITE" value="false">Deny
+                </li>
+                <li>
+                    <div class="radio">
+                        <div class="form-group">
+                            WRITE:
+                            <input type="radio" name="scope.WRITE" value="true" checked="">Approve
+                            <input type="radio" name="scope.WRITE" value="false">Deny
+                        </div>
                     </div>
-                </div>
-            </li>
-        </ul>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block">Authorize</button>
+                </li>
+            </ul>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">Authorize</button>
+            </div>
         </div>
     </form>
 </div>
