@@ -10,10 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
+
+import java.util.Objects;
 
 @Slf4j
 @Controller
@@ -52,8 +55,13 @@ public class AuthUrlMapperController {
     }
 
     @GetMapping("/register")
-    String register() {
-        return "html/register";
+    ModelAndView register(Model model) {
+        ModelAndView modelAndView = new ModelAndView();
+        if (Objects.isNull(model.getAttribute("userDetailDocument"))) {
+            modelAndView.addObject("userDetailDocument", new UserDetailDocument());
+        }
+        modelAndView.setViewName("html/register");
+        return modelAndView;
     }
 
     @RequestMapping(value = "/redirect", method = RequestMethod.GET)
@@ -87,8 +95,10 @@ public class AuthUrlMapperController {
             redirectAttrs.addFlashAttribute("success", "Your account got created, please verify your email to activate.");
         } catch (AuthServiceException exception) {
             redirectAttrs.addFlashAttribute("error", exception.getMessage());
+            redirectAttrs.addFlashAttribute("userDetailDocument", userDetailDocument);
         } catch (Exception exception) {
             redirectAttrs.addFlashAttribute("error", "Unexpected error occurred.");
+            redirectAttrs.addFlashAttribute("userDetailDocument", userDetailDocument);
         }
         return modelAndView;
     }

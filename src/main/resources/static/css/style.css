@@ -5,7 +5,7 @@ html, body {
     font-family: 'Numans', sans-serif;
 }
 
-.alert{
+.alert {
     font-size: 11px;
 }
 
@@ -73,4 +73,10 @@ html, body {
 .form-design input[type="checkbox"] {
     position: relative;
     top: 1px;
+}
+
+.error {
+    color: red;
+    font-size: 13px;
+    padding-left: 10px;
 }

@@ -15,9 +15,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-            crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
@@ -37,34 +34,41 @@
         </button>
     </div>
     <h2 class="font-black">Create Your Account</h2>
-    <form class="md-form" style="color: #192c34;" th:action="@{/register}" method="post">
+    <form class="md-form" style="color: #192c34;" th:action="@{/register}" method="post" id="registrationForm"
+          name="registrationForm">
         <div class="text-center">
             <img th:src="@{/img/logo.png}" class="logo" alt="Avatar">
         </div>
         <div class="form-group">
-            <input type="text" id="username" name="username" class="form-control" placeholder="User Name" required>
+            <input type="text" id="username" name="username" class="form-control" placeholder="User Name" th:value="${userDetailDocument.username}" required>
         </div>
         <div class="form-group">
-            <input type="text" id="name" name="name" class="form-control" placeholder="Your Name" required>
+            <input type="text" id="name" name="name" class="form-control" placeholder="Your Name"  th:value="${userDetailDocument.name}" required>
         </div>
         <div class="form-group">
-            <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Email" th:value="${userDetailDocument.email}"  required>
         </div>
         <div class="form-group">
-            <input type="text" id="address" name="address" class="form-control" placeholder="Address" required>
+            <input type="text" id="address" name="address" class="form-control" placeholder="Address" th:value="${userDetailDocument.address}"  required>
         </div>
         <div class="form-group">
-            <input type="tel" id="telephone" name="telephone" class="form-control" placeholder="Telephone" required>
+            <input type="tel" id="telephone" name="telephone" class="form-control" placeholder="Telephone" th:value="${userDetailDocument.telephone}"  required>
         </div>
         <div class="form-group">
             <input type="text" id="organization" name="organization" class="form-control" placeholder="Organization"
-                   required>
+                   th:value="${userDetailDocument.organization}" required>
         </div>
         <div class="form-group">
-            <input type="password" id="password" name="password" class="form-control" placeholder="New Password" required>
+            <input type="password" id="password" name="password"
+                   data-rule-minlength=8
+                   title="required minimum 8 characters"
+                   class="form-control" placeholder="New Password" required>
         </div>
         <div class="form-group">
-            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm Password" required>
+            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"
+                   data-rule-equalTo="#password"
+                   title="password doesn't match"
+                   placeholder="Confirm Password">
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
@@ -72,5 +76,12 @@
     </form>
     <p class="text-center font-black">Already have an account? <a th:href="@{/login}">Sign In </a></p>
 </div>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.js"></script>
+<script type="text/javascript"
+        src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    $('#registrationForm').validate();
+</script>
 </body>
 </html>
